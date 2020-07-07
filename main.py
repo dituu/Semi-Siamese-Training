@@ -164,7 +164,7 @@ if __name__ == '__main__':
     conf.add_argument('--model_type',type=str, default='mobilefacenet',choices=['mobilefacenet','attention'], help='choose model_type')    
     conf.add_argument('--attention_stages', type=str, default='1,1,1', help="1,1,1; 2,6,2; 3,8,3 is more commen")
     conf.add_argument('--feat_dim', type=int, default=512, help='feature dimension.')
-    conf.add_argument('--queue_size', type=int, default=16384, help='number of prototype queue')
+    conf.add_argument('--queue_size', type=int, default=16384, help='size of prototype queue')
     conf.add_argument('--class_num', type=int, default=72778, help='number of categories')
     conf.add_argument('--loss_type', type=str, default='softmax',choices=['softmax','am_softmax','arc_softmax'], help="loss type, can be softmax, am or arc")
     conf.add_argument('--margin', type=float, default=0.0, help='loss margin ')
