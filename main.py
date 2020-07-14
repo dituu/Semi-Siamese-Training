@@ -48,29 +48,31 @@ def trainlist_to_dict(source_file):
 
 
 def train_sample(train_dict, class_num, queue_size, last_id_list=False):
-    all_id_list = range(0, class_num)
+    all_id = range(0, class_num)
     # Make sure there is no overlap ids bewteen queue and curr batch.
     if last_id_list:
-        tail_id= last_id_list[-queue_size:]
-        non_overlap_id = list(set(all_id_list) - set(tail_id))
-        head_id = random.sample(non_overlap_id, queue_size)
-        remain_id = random.sample(list(set(all_id_list) - set(head_id)),class_num - queue_size)
-        head_id.extend(remain_id) 
-        curr_id_list = head_id
+        last_tail_id= last_id_list[-queue_size:]
+        non_overlap_id = list(set(all_id) - set(last_tail_id))
+        assert len(non_overlap_id) > = queue_size
+        curr_head_id = random.sample(non_overlap_id, queue_size)
+        curr_remain_id = list(set(all_id) - set(curr_head_id))
+        random.shuffle(curr_remain_id)
+        curr_head_id.extend(curr_remain_id) 
+        curr_id_list = curr_head_id
     else:
-        curr_id_list = random.sample(all_id_list, class_num)
+        random.shuffle(all_id)
+        curr_id_list = all_id
     
     # For each ID, two images are randomly sampled
     curr_train_list =[]
     for index in curr_id_list:
         lmdb_key_list =  train_dict[index]['lmdb_key']
-        if int(train_dict[index]['num_images'])>1:
+        if int(train_dict[index]['num_images']) >= 2:
             training_samples = random.sample(lmdb_key_list, 2)
-            line = training_samples[0] +' ' + training_samples[1]
-            curr_train_list.append(line+' '+str(index) +'\n')
+            line = training_samples[0] + ' ' + training_samples[1]
         else:
-            line = lmdb_key_list[0] + ' '+lmdb_key_list[0]+' ' +str(index)
-            curr_train_list.append(line+ '\n')
+            line = lmdb_key_list[0] + ' '+ lmdb_key_list[0]
+        curr_train_list.append(line+ ' '+ str(index) +'\n')
     return curr_train_list,curr_id_list
 
 
