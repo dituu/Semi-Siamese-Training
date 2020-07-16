@@ -18,7 +18,7 @@ logger.basicConfig(level=logger.INFO, format='%(levelname)s %(asctime)s %(filena
 
 
 
-def train_bn(m):
+def train_BN(m):
     classname = m.__class__.__name__
     if classname.find('BatchNorm') != -1:
         m.train()
@@ -92,7 +92,7 @@ def train_one_epoch(data_loader, probe_net, gallery_net, prototype, optimizer,
     initial_lr = get_lr(optimizer)
 
     probe_net.train()
-    gallery_net.eval().apply(train_bn)
+    gallery_net.eval().apply(train_BN)
 
     for batch_idx, (images, _ ) in enumerate(data_loader):
         batch_size = images.size(0)
