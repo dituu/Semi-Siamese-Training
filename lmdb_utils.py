@@ -20,14 +20,14 @@ def transform(image):
     # horizontal flipping
     if random.random() > 0.5:
         image = cv2.flip(image, 1) 
+    # grayscale conversion
+    if random.random() > 0.8:
+        image= cv2.cvtColor(image,cv2.COLOR_BGR2GRAY)
     # rotation
-    if random.random() > 0.75:
+    if random.random() > 0.5:
         theta = (random.randint(-10,10)) * np.pi / 180
         M_rotate = np.array([[np.cos(theta), -np.sin(theta), 0],[np.sin(theta), np.cos(theta), 0]], dtype=np.float32)
         image = cv2.warpAffine(image, M_rotate, (img_size, img_size))
-    # grayscale conversion
-    if random.random() > 0.75:
-        image= cv2.cvtColor(image,cv2.COLOR_BGR2GRAY)
     # normalizing
     if image.ndim == 2:
         image = (image - 127.5) * 0.0078125
