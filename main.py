@@ -31,7 +31,15 @@ def moving_average(probe, gallery, alpha):
     for param_probe, param_gallery in zip(probe.parameters(), gallery.parameters()):
         param_gallery.data =  alpha* param_gallery.data + (1 - alpha) * param_probe.detach().data
 
-
+        
+####### shuffleBN for batch, the same as MoCo https://arxiv.org/abs/1911.05722 #######
+def shuffle_BN(batch_size):
+    shuffle_ids = torch.randperm(batch_size).long().cuda()
+    reshuffle_ids = torch.zeros(batch_size).long().cuda()
+    reshuffle_ids.index_copy_(0, shuffle_ids, torch.arange(batch_size).long().cuda())
+    return shuffle_ids, reshuffle_ids
+  
+  
 def trainlist_to_dict(source_file):
     trainfile_dict = {}
     with open(source_file, 'r') as infile:
@@ -53,7 +61,7 @@ def train_sample(train_dict, class_num, queue_size, last_id_list=False):
     if last_id_list:
         last_tail_id= last_id_list[-queue_size:]
         non_overlap_id = list(set(all_id) - set(last_tail_id))
-        assert len(non_overlap_id) > = queue_size
+        assert len(non_overlap_id) >= queue_size
         curr_head_id = random.sample(non_overlap_id, queue_size)
         curr_remain_id = list(set(all_id) - set(curr_head_id))
         random.shuffle(curr_remain_id)
@@ -96,17 +104,25 @@ def train_one_epoch(data_loader, probe_net, gallery_net, prototype, optimizer,
         images = images.cuda()
         x1, x2 = torch.split(images, [3, 3], dim=1)  
 
-        # random set inputs as probe or gallery
+        # set inputs as probe or gallery 
+        shuffle_ids, reshuffle_ids = shuffle_BN(batch_size)
         x1_probe = probe_net(x1)
         with torch.no_grad():
-            x2_gallery = gallery_net(x2)  
+            x2 = x2[shuffle_ids]
+            x2_gallery = gallery_net(x2)[reshuffle_ids]
+            x2 = x2[reshuffle_ids]
+     
+        shuffle_ids, reshuffle_ids = shuffle_BN(batch_size)
         x2_probe = probe_net(x2)
         with torch.no_grad():
-            x1_gallery = gallery_net(x1)
+            x1 = x1[shuffle_ids]
+            x1_gallery = gallery_net(x1)[reshuffle_ids]
+            x1 = x1[reshuffle_ids]
+            
         output1, output2  = prototype(x1_probe,x2_gallery,x2_probe,x1_gallery,label)
-
-        # random set inputs as probe or gallery
         loss = criterion(output1, label) + criterion(output2, label)
+        
+        # update
         optimizer.zero_grad()
         loss.backward()
         optimizer.step()
