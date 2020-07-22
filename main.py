@@ -150,7 +150,6 @@ def train_sst(conf):
     lr_schedule = optim.lr_scheduler.MultiStepLR(optimizer, milestones=conf.lr_decay_epochs, gamma=0.1)
     probe_net = torch.nn.DataParallel(probe_net).cuda()
     gallery_net = torch.nn.DataParallel(gallery_net).cuda()
-
     train_dict = trainlist_to_dict(conf.source_file)
 
     for epoch in range(1, conf.epochs + 1):
@@ -158,7 +157,7 @@ def train_sst(conf):
             curr_train_list, curr_id_list = train_sample(train_dict, conf.class_num, conf.queue_size)
         else:
             curr_train_list, curr_id_list = train_sample(train_dict, conf.class_num, conf.queue_size, curr_id_list)
-        data_loader = DataLoader(lmdb_utils.SingleLMDBDataset(conf.source_lmdb, curr_train_list, conf.key),
+        data_loader = DataLoader(Dataset(conf.source_lmdb, curr_train_list, conf.key),
                                  conf.batch_size, shuffle = False, num_workers=4, drop_last = True)
         train_one_epoch(data_loader, probe_net, gallery_net, prototype, optimizer, 
             criterion, epoch, conf)
