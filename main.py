@@ -1,4 +1,4 @@
-from model import AttentionNet, MobileFaceNet
+from networks import MobileFaceNet
 from tensorboardX import SummaryWriter
 from prototype import Prototype
 from datetime import datetime
@@ -11,7 +11,6 @@ import argparse
 import numpy as np
 import torch
 import random
-import lmdb_utils
 import logging as logger
 logger.basicConfig(level=logger.INFO, format='%(levelname)s %(asctime)s %(filename)s: %(lineno)d] %(message)s',
                    datefmt='%Y-%m-%d %H:%M:%S')
@@ -141,12 +140,8 @@ def train_one_epoch(data_loader, probe_net, gallery_net, prototype, optimizer,
         logger.info('save checkpoint %s to disk...' % saved_name)
 
 def train_sst(conf):
-    if conf.model_type == 'attention':
-        probe_net = AttentionNet(attention_stages=conf.attention_stages, dim=conf.feat_dim)
-        gallery_net = AttentionNet(attention_stages=conf.attention_stages, dim=conf.feat_dim) 
-    elif conf.model_type == 'mobilefacenet':
-        probe_net = MobileFaceNet(conf.feat_dim)
-        gallery_net = MobileFaceNet(conf.feat_dim) 
+    probe_net = MobileFaceNet(conf.feat_dim)
+    gallery_net = MobileFaceNet(conf.feat_dim) 
         
     moving_average(probe_net, gallery_net, 0)
     prototype = Prototype(conf.feat_dim, conf.queue_size, conf.scale,conf.margin, conf.loss_type).cuda()     
@@ -179,7 +174,7 @@ if __name__ == '__main__':
     conf.add_argument("--train_file_dir", type=str, default='/export/home/data/deepglint_unoverlap_part40', help="input train file dir.")
     conf.add_argument("--train_file_name", type=str, default='deepglint_train_list.txt', help="input train file name.")
     conf.add_argument("--output_model_dir", type=str, default='./snapshot', help=" save model paths")
-    conf.add_argument('--model_type',type=str, default='mobilefacenet',choices=['mobilefacenet','attention'], help='choose model_type')    
+    conf.add_argument('--model_type',type=str, default='mobilefacenet',choices=['mobilefacenet'], help='choose model_type')    
     conf.add_argument('--attention_stages', type=str, default='1,1,1', help="1,1,1; 2,6,2; 3,8,3 is more commen")
     conf.add_argument('--feat_dim', type=int, default=512, help='feature dimension.')
     conf.add_argument('--queue_size', type=int, default=16384, help='size of prototype queue')
