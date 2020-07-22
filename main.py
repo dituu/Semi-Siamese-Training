@@ -174,7 +174,6 @@ if __name__ == '__main__':
     conf.add_argument("--train_file_name", type=str, default='deepglint_train_list.txt', help="input train file name.")
     conf.add_argument("--output_model_dir", type=str, default='./snapshot', help=" save model paths")
     conf.add_argument('--model_type',type=str, default='mobilefacenet',choices=['mobilefacenet'], help='choose model_type')    
-    conf.add_argument('--attention_stages', type=str, default='1,1,1', help="1,1,1; 2,6,2; 3,8,3 is more commen")
     conf.add_argument('--feat_dim', type=int, default=512, help='feature dimension.')
     conf.add_argument('--queue_size', type=int, default=16384, help='size of prototype queue')
     conf.add_argument('--class_num', type=int, default=72778, help='number of categories')
@@ -182,8 +181,8 @@ if __name__ == '__main__':
     conf.add_argument('--margin', type=float, default=0.0, help='loss margin ')
     conf.add_argument('--scale', type=float, default=30.0, help='scaling parameter ')
     conf.add_argument('--lr', type=float, default=0.05, help='initial learning rate.')
-    conf.add_argument('--epochs', type=int, default=100, help='how many epochs you want to train.')
-    conf.add_argument('--lr_decay_epochs', type=str, default='48,72,90', help='similar to step specified in caffe solver, but in epoch mechanism')
+    conf.add_argument('--epochs', type=int, default=100, help='training epochs')
+    conf.add_argument('--lr_decay_epochs', type=str, default='48,72,90', help='training epochs')
     conf.add_argument('--momentum', type=float, default=0.9, help='momentum')
     conf.add_argument('--alpha', type=float, default=0.999, help='weight of moving_average')
     conf.add_argument('--batch_size', type=int, default=128, help='batch size over all gpus.')
@@ -191,7 +190,6 @@ if __name__ == '__main__':
     conf.add_argument('--save_freq', type=int, default=1, help='frequency of saving current training state.')
     args = conf.parse_args()
     args.lr_decay_epochs = [int(p) for p in args.lr_decay_epochs.split(',')]
-    args.attention_stages = [int(s) for s in args.attention_stages.split(',')]
     args.source_file = os.path.join(args.train_file_dir, args.train_file_name)
     args.source_lmdb = os.path.join(args.train_db_dir, args.train_db_name)
 
