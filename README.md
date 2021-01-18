@@ -6,7 +6,7 @@ This is an implementation of Semi-Siamese Training (SST) by Pytorch. SST is a no
 
 ## What's New
 
-One can find the complete implementation at [FaceX-Zoo]https://github.com/JDAI-CV/FaceX-Zoo.
+One can find the complete implementation at FaceX-Zoo(https://github.com/JDAI-CV/FaceX-Zoo).
 
 
 ## Acknowledgement
